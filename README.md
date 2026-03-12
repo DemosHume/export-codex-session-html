@@ -1,5 +1,8 @@
 # Export Codex Session HTML
 
+[![CI](https://github.com/DemosHume/export-codex-session-html/actions/workflows/ci.yml/badge.svg)](https://github.com/DemosHume/export-codex-session-html/actions/workflows/ci.yml)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 Export local Codex Desktop session transcripts into clean, shareable HTML files.
 
 [中文](#中文) | [English](#english)

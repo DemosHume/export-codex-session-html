@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile exporter
+        run: python -m py_compile scripts/export_session_html.py
+
+      - name: Validate skill files
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          skill_md = Path("SKILL.md")
+          openai_yaml = Path("agents/openai.yaml")
+          content = skill_md.read_text(encoding="utf-8")
+
+          if not content.startswith("---\n"):
+              raise SystemExit("SKILL.md is missing YAML frontmatter")
+          if "\nname: export-codex-session-html\n" not in content:
+              raise SystemExit("SKILL.md is missing the expected skill name")
+          if "\ndescription: " not in content:
+              raise SystemExit("SKILL.md is missing the description field")
+          if not openai_yaml.exists():
+              raise SystemExit("agents/openai.yaml is missing")
+          if "display_name:" not in openai_yaml.read_text(encoding="utf-8"):
+              raise SystemExit("agents/openai.yaml is missing display_name")
+          PY
+
+      - name: Smoke test exporter
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+
+          with tempfile.TemporaryDirectory() as tmp:
+              tmp_path = Path(tmp)
+              codex_home = tmp_path / ".codex"
+              sessions_dir = codex_home / "sessions" / "2026" / "03" / "12"
+              sessions_dir.mkdir(parents=True)
+
+              thread_id = "019ce1a0-4e0a-7952-b624-101ddcd3e4a6"
+              session_path = sessions_dir / f"rollout-2026-03-12T18-38-30-{thread_id}.jsonl"
+              session_index_path = codex_home / "session_index.jsonl"
+              output_dir = tmp_path / "out"
+              output_dir.mkdir()
+
+              records = [
+                  {
+                      "timestamp": "2026-03-12T10:39:02.294Z",
+                      "type": "session_meta",
+                      "payload": {
+                          "id": thread_id,
+                          "timestamp": "2026-03-12T10:38:30.735Z",
+                          "cwd": "C:\\\\workspace",
+                      },
+                  },
+                  {
+                      "timestamp": "2026-03-12T10:39:02.295Z",
+                      "type": "response_item",
+                      "payload": {
+                          "type": "message",
+                          "role": "user",
+                          "content": [
+                              {
+                                  "type": "input_text",
+                                  "text": "Export this conversation please.",
+                              }
+                          ],
+                      },
+                  },
+                  {
+                      "timestamp": "2026-03-12T10:39:09.819Z",
+                      "type": "response_item",
+                      "payload": {
+                          "type": "message",
+                          "role": "assistant",
+                          "phase": "final_answer",
+                          "content": [
+                              {
+                                  "type": "output_text",
+                                  "text": "Transcript exported successfully.",
+                              }
+                          ],
+                      },
+                  },
+              ]
+
+              with session_path.open("w", encoding="utf-8") as handle:
+                  for record in records:
+                      handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+              session_index_path.write_text(
+                  json.dumps(
+                      {
+                          "id": thread_id,
+                          "thread_name": "Sample Export Session",
+                          "updated_at": "2026-03-12T10:39:09.819Z",
+                      },
+                      ensure_ascii=False,
+                  )
+                  + "\n",
+                  encoding="utf-8",
+              )
+
+              env = os.environ.copy()
+              env["CODEX_HOME"] = str(codex_home)
+              env["CODEX_THREAD_ID"] = thread_id
+
+              subprocess.run(
+                  [
+                      sys.executable,
+                      "scripts/export_session_html.py",
+                      "--output-dir",
+                      str(output_dir),
+                  ],
+                  check=True,
+                  env=env,
+              )
+
+              html_files = list(output_dir.glob("*.html"))
+              if len(html_files) != 1:
+                  raise SystemExit(f"Expected one HTML output file, found {len(html_files)}")
+
+              html_text = html_files[0].read_text(encoding="utf-8")
+              for expected in (
+                  "Sample Export Session",
+                  "Export this conversation please.",
+                  "Transcript exported successfully.",
+                  "Thread ID:",
+              ):
+                  if expected not in html_text:
+                      raise SystemExit(f"Missing expected text in HTML: {expected}")
+          PY
