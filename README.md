@@ -14,8 +14,6 @@ Export local Codex Desktop session transcripts into clean, shareable HTML files.
 - Generate readable HTML transcripts for sharing or archiving
 - Works with `CODEX_HOME`, Windows `%USERPROFILE%\.codex`, and Unix `~/.codex`
 
-![Social preview draft](./assets/social-preview.png)
-
 ## 中文
 
 ### 这是什么
@@ -55,11 +53,8 @@ Export local Codex Desktop session transcripts into clean, shareable HTML files.
 ├── LICENSE
 ├── agents/
 │   └── openai.yaml
-├── assets/
-│   └── social-preview.png
 └── scripts/
-    ├── export_session_html.py
-    └── generate_social_preview.py
+    └── export_session_html.py
 ```
 
 ### 安装方式
@@ -123,12 +118,6 @@ $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USER
 - 如果用户明确需要“原始完整 transcript”，可以加 `--include-bootstrap` 或继续扩展脚本
 - 这个仓库不包含任何用户私有会话数据，只包含 skill 定义和导出脚本
 
-### GitHub Social Preview
-
-- 可直接上传的预览图在 `assets/social-preview.png`
-- GitHub 仓库设置入口：`Settings -> Social preview -> Edit -> Upload an image`
-- 当前图片规格为 `1280x640`，适合 GitHub 官方推荐尺寸
-
 ### 许可证
 
 本项目使用 `MIT` 许可证，见 [LICENSE](./LICENSE)。
@@ -172,11 +161,8 @@ It reads local JSONL session files from the current user's Codex home, filters o
 ├── LICENSE
 ├── agents/
 │   └── openai.yaml
-├── assets/
-│   └── social-preview.png
 └── scripts/
-    ├── export_session_html.py
-    └── generate_social_preview.py
+    └── export_session_html.py
 ```
 
 ### Installation
@@ -239,12 +225,6 @@ The generated HTML includes:
 - By default, the exporter includes conversation messages only, not tool calls or tool outputs
 - If you need a more raw transcript, use `--include-bootstrap` or extend the script
 - This repository contains only the skill definition and exporter script, not any private user session data
-
-### GitHub Social Preview
-
-- A ready-to-upload preview image is included at `assets/social-preview.png`
-- GitHub upload path: `Settings -> Social preview -> Edit -> Upload an image`
-- The image is already generated at `1280x640`, which matches GitHub's recommended size
 
 ### License
 
