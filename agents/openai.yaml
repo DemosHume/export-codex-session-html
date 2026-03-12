@@ -1,0 +1,4 @@
+interface:
+  display_name: "Export Codex Session HTML"
+  short_description: "Export Codex desktop session transcripts to HTML"
+  default_prompt: "Use $export-codex-session-html to export the current Codex chat into an HTML transcript."
