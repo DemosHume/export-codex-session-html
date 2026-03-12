@@ -1,6 +1,15 @@
 # Export Codex Session HTML
 
+Export local Codex Desktop session transcripts into clean, shareable HTML files.
+
 [中文](#中文) | [English](#english)
+
+## Highlights
+
+- Export the current Codex thread or a specific thread ID
+- Filter bootstrap noise by default
+- Generate readable HTML transcripts for sharing or archiving
+- Works with `CODEX_HOME`, Windows `%USERPROFILE%\.codex`, and Unix `~/.codex`
 
 ## 中文
 
@@ -25,6 +34,12 @@
 - 自动从 thread title 或首条真实用户消息生成文件名
 - 输出到当前工作目录，便于直接整理到项目里
 - 兼容 `CODEX_HOME`、Windows `%USERPROFILE%\.codex`、Unix `~/.codex`
+
+### 环境要求
+
+- Codex Desktop 或兼容的本地 session 目录
+- Python 3
+- Windows 下建议配合 `$conda-codex-python`
 
 ### 仓库结构
 
@@ -99,6 +114,10 @@ $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USER
 - 如果用户明确需要“原始完整 transcript”，可以加 `--include-bootstrap` 或继续扩展脚本
 - 这个仓库不包含任何用户私有会话数据，只包含 skill 定义和导出脚本
 
+### 许可证
+
+本项目使用 `MIT` 许可证，见 [LICENSE](./LICENSE)。
+
 ## English
 
 ### What This Is
@@ -122,6 +141,12 @@ It reads local JSONL session files from the current user's Codex home, filters o
 - Generates a safe output filename from the thread title or first real user message
 - Writes output to the current working directory
 - Supports `CODEX_HOME`, Windows `%USERPROFILE%\.codex`, and Unix `~/.codex`
+
+### Requirements
+
+- Codex Desktop or a compatible local session directory
+- Python 3
+- On Windows, `$conda-codex-python` is the recommended wrapper
 
 ### Repository Layout
 
@@ -195,3 +220,7 @@ The generated HTML includes:
 - By default, the exporter includes conversation messages only, not tool calls or tool outputs
 - If you need a more raw transcript, use `--include-bootstrap` or extend the script
 - This repository contains only the skill definition and exporter script, not any private user session data
+
+### License
+
+This project is licensed under the `MIT` License. See [LICENSE](./LICENSE).
